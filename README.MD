@@ -1,25 +1,18 @@
 # dependency
 
 ```access transformers
-        <repository>
-            <id>nealxyc-github-repo</id>
-            <url>https://raw.githubusercontent.com/nealxyc/mvn-repo/master/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
+    <repository>
+        <id>github</id>
+        <name>GitHub Packages</name>
+        <url>https://maven.pkg.github.com/Lairon1/0xCommandLib</url>
+    </repository>
 ```
 
 ```access transformers
         <dependency>
             <groupId>com.lairon.libs</groupId>
             <artifactId>0xCommandLib</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>1.3</version>
             <scope>compile</scope>
         </dependency>
 ```

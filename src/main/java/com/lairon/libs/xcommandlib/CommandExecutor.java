@@ -2,11 +2,11 @@ package com.lairon.libs.xcommandlib;
 
 import com.lairon.libs.xcommandlib.exception.DontHavePermissionException;
 import com.lairon.libs.xcommandlib.exception.OnlyPlayerException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -24,7 +24,10 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
     private Consumer<CommandAction> senderDontHasPermissionAction;
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command cmd, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(@NonNull CommandSender sender,
+                             @NonNull org.bukkit.command.Command cmd,
+                             @NonNull String label,
+                             @NonNull String[] args) {
         if (args.length == 0) {
             if (defaultCommand != null) defaultCommand.onCommand(sender, cmd, label, args);
             return false;
@@ -50,13 +53,17 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull org.bukkit.command.Command cmd, @NotNull String alias, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NonNull CommandSender sender,
+                                                @NonNull org.bukkit.command.Command cmd,
+                                                @NonNull String alias,
+                                                @NonNull String[] args) {
         List<String> tabs = new ArrayList<>();
         if (args.length == 1) {
             for (Command command : commandRegistry.getCommands()) {
                 try {
                     if (isAvailableCommand(command, sender))
                         tabs.add(command.getId());
+                        tabs.addAll(command.getAlliances());
                 } catch (Exception e) {}
             }
         } else {
@@ -72,7 +79,8 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
         return filter(tabs, args);
     }
 
-    public boolean isAvailableCommand(@NotNull Command command, @NotNull CommandSender sender) throws DontHavePermissionException, OnlyPlayerException {
+    public boolean isAvailableCommand(@NonNull Command command,
+                                      @NonNull CommandSender sender) throws DontHavePermissionException, OnlyPlayerException {
         if (command.getPermission() != null && !sender.hasPermission(command.getPermission()))
             throw new DontHavePermissionException(sender, command.getPermission());
         if (command.isOnlyPlayer() && !(sender instanceof Player))

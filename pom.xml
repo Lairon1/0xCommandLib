@@ -6,7 +6,7 @@
 
     <groupId>ru.lairon.libs</groupId>
     <artifactId>0xCommandLib</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>0xCommandLib</name>
@@ -20,21 +20,14 @@
 
     <distributionManagement>
         <repository>
-            <id>internal.repo</id>
-            <name>Github Repo</name>
-            <url>file://mvn-repo</url>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/Lairon1/0xCommandLib</url>
         </repository>
     </distributionManagement>
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <altDeploymentRepository>internal.repo::default::file://mvn-repo</altDeploymentRepository>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
