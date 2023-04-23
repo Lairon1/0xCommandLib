@@ -1,90 +1,105 @@
 package com.lairon.libs.xcommandlib;
 
+import com.lairon.libs.xcommandlib.action.CommandAction;
+import com.lairon.libs.xcommandlib.action.CommandNotFoundAction;
 import com.lairon.libs.xcommandlib.exception.DontHavePermissionException;
 import com.lairon.libs.xcommandlib.exception.OnlyPlayerException;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import com.lairon.libs.xcommandlib.model.SubCommand;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
-@RequiredArgsConstructor
-@Setter
+
 public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.bukkit.command.TabCompleter {
 
     private final CommandRegistry commandRegistry;
-    private Command defaultCommand;
+    private SubCommand defaultSubCommand;
     private Consumer<CommandNotFoundAction> commandNotFoundAction;
     private Consumer<CommandAction> onlyPlayerAction;
     private Consumer<CommandAction> senderDontHasPermissionAction;
 
+    public CommandExecutor(CommandRegistry commandRegistry) {
+        Objects.requireNonNull(commandRegistry, "commandRegistry can not be null");
+        this.commandRegistry = commandRegistry;
+    }
+
     @Override
-    public boolean onCommand(@NonNull CommandSender sender,
-                             @NonNull org.bukkit.command.Command cmd,
-                             @NonNull String label,
-                             @NonNull String[] args) {
+    public boolean onCommand(CommandSender sender,
+                             org.bukkit.command.Command cmd,
+                             String label,
+                             String[] args) {
+        Objects.requireNonNull(sender, "sender can not be null");
+        Objects.requireNonNull(cmd, "cmd can not be null");
+        Objects.requireNonNull(label, "label can not be null");
+        Objects.requireNonNull(args, "args can not be null");
         if (args.length == 0) {
-            if (defaultCommand != null) defaultCommand.onCommand(sender, cmd, label, args);
+            if (defaultSubCommand != null) defaultSubCommand.onCommand(sender, cmd, label, args);
             return false;
         } else {
-            Command command = commandRegistry.getCommand(args[0]);
-            if (command == null) {
+            SubCommand subCommand = commandRegistry.getCommand(args[0]);
+            if (subCommand == null) {
                 if (commandNotFoundAction != null)
                     commandNotFoundAction.accept(new CommandNotFoundAction(sender, args[0]));
                 return false;
             }
             try {
-                if (isAvailableCommand(command, sender))
-                    command.onCommand(sender, cmd, label, args);
+                if (isAvailableCommand(subCommand, sender))
+                    subCommand.onCommand(sender, cmd, label, args);
             } catch (DontHavePermissionException e) {
-                if(senderDontHasPermissionAction != null)
-                    senderDontHasPermissionAction.accept(new CommandAction(sender, command));
+                if (senderDontHasPermissionAction != null)
+                    senderDontHasPermissionAction.accept(new CommandAction(sender, subCommand));
             } catch (OnlyPlayerException e) {
                 if(onlyPlayerAction != null)
-                    onlyPlayerAction.accept(new CommandAction(sender, command));
+                    onlyPlayerAction.accept(new CommandAction(sender, subCommand));
             }
         }
         return false;
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NonNull CommandSender sender,
-                                                @NonNull org.bukkit.command.Command cmd,
-                                                @NonNull String alias,
-                                                @NonNull String[] args) {
+    public List<String> onTabComplete(CommandSender sender,
+                                      org.bukkit.command.Command cmd,
+                                      String alias,
+                                      String[] args) {
+        Objects.requireNonNull(sender, "sender can not be null");
+        Objects.requireNonNull(cmd, "cmd can not be null");
+        Objects.requireNonNull(args, "args can not be null");
         List<String> tabs = new ArrayList<>();
         if (args.length == 1) {
-            for (Command command : commandRegistry.getCommands()) {
+            for (SubCommand subCommand : commandRegistry.getCommands()) {
                 try {
-                    if (isAvailableCommand(command, sender))
-                        tabs.add(command.getId());
-                        tabs.addAll(command.getAlliances());
-                } catch (Exception e) {}
+                    if (isAvailableCommand(subCommand, sender)) {
+                        tabs.add(subCommand.getSettings().getId());
+                        tabs.addAll(subCommand.getSettings().getAliases());
+                    }
+                } catch (Exception ignored) {
+                }
             }
         } else {
-            Command command = commandRegistry.getCommand(args[0]);
+            SubCommand subCommand = commandRegistry.getCommand(args[0]);
             try {
-                if(command != null && isAvailableCommand(command, sender)){
-                    List<String> strings = command.onTabComplete(sender, cmd, alias, args);
-                    if(strings != null)
+                if (subCommand != null && isAvailableCommand(subCommand, sender)) {
+                    List<String> strings = subCommand.onTabComplete(sender, cmd, alias, args);
+                    if (strings != null)
                         tabs.addAll(strings);
                 }
-            } catch (Exception e) {}
+            } catch (Exception ignored) {
+            }
         }
         return filter(tabs, args);
     }
 
-    public boolean isAvailableCommand(@NonNull Command command,
-                                      @NonNull CommandSender sender) throws DontHavePermissionException, OnlyPlayerException {
-        if (command.getPermission() != null && !sender.hasPermission(command.getPermission()))
-            throw new DontHavePermissionException(sender, command.getPermission());
-        if (command.isOnlyPlayer() && !(sender instanceof Player))
-            throw new OnlyPlayerException(command);
+    public boolean isAvailableCommand(SubCommand subCommand,
+                                      CommandSender sender) throws DontHavePermissionException, OnlyPlayerException {
+        if (subCommand.getSettings().getPermission() != null && !sender.hasPermission(subCommand.getSettings().getPermission()))
+            throw new DontHavePermissionException(sender, subCommand);
+        if (subCommand.getSettings().isOnlyPlayer() && !(sender instanceof Player))
+            throw new OnlyPlayerException(sender, subCommand);
         return true;
     }
 
@@ -100,4 +115,19 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
         return result;
     }
 
+    public void setCommandNotFoundAction(Consumer<CommandNotFoundAction> commandNotFoundAction) {
+        this.commandNotFoundAction = commandNotFoundAction;
+    }
+
+    public void setOnlyPlayerAction(Consumer<CommandAction> onlyPlayerAction) {
+        this.onlyPlayerAction = onlyPlayerAction;
+    }
+
+    public void setSenderDontHasPermissionAction(Consumer<CommandAction> senderDontHasPermissionAction) {
+        this.senderDontHasPermissionAction = senderDontHasPermissionAction;
+    }
+
+    public void setDefaultSubCommand(SubCommand defaultSubCommand) {
+        this.defaultSubCommand = defaultSubCommand;
+    }
 }

@@ -12,7 +12,7 @@
         <dependency>
             <groupId>com.lairon.libs</groupId>
             <artifactId>0xCommandLib</artifactId>
-            <version>1.3</version>
+            <version>2.0</version>
             <scope>compile</scope>
         </dependency>
 ```
