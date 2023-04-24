@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.bukkit.command.TabCompleter {
 
     private final CommandRegistry commandRegistry;
-    private SubCommand defaultSubCommand;
+    private SubCommand defaultCommand;
     private Consumer<CommandNotFoundAction> commandNotFoundAction;
     private Consumer<CommandAction> onlyPlayerAction;
     private Consumer<CommandAction> senderDontHasPermissionAction;
@@ -38,7 +38,7 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
         Objects.requireNonNull(label, "label can not be null");
         Objects.requireNonNull(args, "args can not be null");
         if (args.length == 0) {
-            if (defaultSubCommand != null) defaultSubCommand.onCommand(sender, cmd, label, args);
+            if (defaultCommand != null) defaultCommand.onCommand(sender, cmd, label, args);
             return false;
         } else {
             SubCommand subCommand = commandRegistry.getCommand(args[0]);
@@ -127,7 +127,7 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
         this.senderDontHasPermissionAction = senderDontHasPermissionAction;
     }
 
-    public void setDefaultSubCommand(SubCommand defaultSubCommand) {
-        this.defaultSubCommand = defaultSubCommand;
+    public void setDefaultCommand(SubCommand defaultCommand) {
+        this.defaultCommand = defaultCommand;
     }
 }
