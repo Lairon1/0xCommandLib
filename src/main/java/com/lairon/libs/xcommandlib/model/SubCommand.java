@@ -17,6 +17,7 @@ public abstract class SubCommand implements CommandExecutor, TabCompleter {
      */
     public SubCommand(SubCommandSettings settings) {
         Objects.requireNonNull(settings, "settings can not be null");
+
         this.settings = settings;
     }
 
