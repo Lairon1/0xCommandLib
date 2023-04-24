@@ -18,14 +18,6 @@
 
     <url>http://0xLairon1.ru</url>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/Lairon1/0xCommandLib</url>
-        </repository>
-    </distributionManagement>
-
     <build>
         <plugins>
             <plugin>
