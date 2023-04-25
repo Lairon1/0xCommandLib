@@ -13,7 +13,7 @@
 <dependency>
     <groupId>ru.lairon.libs</groupId>
     <artifactId>0xCommandLib</artifactId>
-    <version>2.2.1</version>
+    <version>2.3</version>
     <scope>compile</scope>
 </dependency>
 ```
