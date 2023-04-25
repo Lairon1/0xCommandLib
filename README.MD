@@ -36,7 +36,7 @@ XCommandLib is a simple library that will help you quickly and easily create com
         // Create a CommandExecutor,
         // you need it in order to register it as a Bukkit command.
         // It will manage all subcommands for you.
-        CommandExecutor commandExecutor = new CommandExecutor(commandRegistry);
+        CommandExecutor commandExecutor = new CommandExecutor(commandRegistry, Plugin);
 
         // Register the CommandExecutor as a regular command for Bukkit
         // You can also register the CommandExecutor as a TabCompleter,
