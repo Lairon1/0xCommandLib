@@ -6,8 +6,10 @@ import com.lairon.libs.xcommandlib.exception.DontHavePermissionException;
 import com.lairon.libs.xcommandlib.exception.OnlyPlayerException;
 import com.lairon.libs.xcommandlib.model.SubCommand;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +24,13 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
     private Consumer<CommandNotFoundAction> commandNotFoundAction;
     private Consumer<CommandAction> onlyPlayerAction;
     private Consumer<CommandAction> senderDontHasPermissionAction;
+    private Plugin owner;
 
-    public CommandExecutor(CommandRegistry commandRegistry) {
+    public CommandExecutor(CommandRegistry commandRegistry, Plugin owner) {
         Objects.requireNonNull(commandRegistry, "commandRegistry can not be null");
+        Objects.requireNonNull(owner, "owner can not be null");
         this.commandRegistry = commandRegistry;
+        this.owner = owner;
     }
 
     @Override
@@ -38,7 +43,7 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
         Objects.requireNonNull(label, "label can not be null");
         Objects.requireNonNull(args, "args can not be null");
         if (args.length == 0) {
-            if (defaultCommand != null) defaultCommand.onCommand(sender, cmd, label, args);
+            if (defaultCommand != null) executeCommand(defaultCommand, sender, cmd, label, args);
             return false;
         } else {
             SubCommand subCommand = commandRegistry.getCommand(args[0]);
@@ -48,8 +53,7 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
                 return false;
             }
             try {
-                if (isAvailableCommand(subCommand, sender))
-                    subCommand.onCommand(sender, cmd, label, args);
+                if (isAvailableCommand(subCommand, sender)) executeCommand(subCommand, sender, cmd, label, args);
             } catch (DontHavePermissionException e) {
                 if (senderDontHasPermissionAction != null)
                     senderDontHasPermissionAction.accept(new CommandAction(sender, subCommand));
@@ -59,6 +63,26 @@ public class CommandExecutor implements org.bukkit.command.CommandExecutor, org.
             }
         }
         return false;
+    }
+
+    private void executeCommand(SubCommand command,
+                                CommandSender sender,
+                                org.bukkit.command.Command cmd,
+                                String label,
+                                String[] args){
+        Objects.requireNonNull(command, "command can not be null");
+        Objects.requireNonNull(sender, "sender can not be null");
+        Objects.requireNonNull(cmd, "cmd can not be null");
+        Objects.requireNonNull(label, "label can not be null");
+        Objects.requireNonNull(args, "args can not be null");
+
+        if(command.getSettings().isAsync()){
+            Bukkit.getScheduler().runTaskAsynchronously(owner,
+                    () -> command.onCommand(sender, cmd, label, args)
+            );
+        }else{
+            command.onCommand(sender, cmd, label, args);
+        }
     }
 
     @Override

@@ -83,6 +83,9 @@ public class YourSubCommand extends SubCommand {
                 // Or add aliases 1 at a time
                 .alias("alias3") // (NOT NECESSARY)
                 .alias("alias4") // (NOT NECESSARY)
+                // If true then the command will be executed
+                // in Bukkit Asynchronously scheduler
+                .async(true) // (NOT NECESSARY)
                 .build());
     }
 

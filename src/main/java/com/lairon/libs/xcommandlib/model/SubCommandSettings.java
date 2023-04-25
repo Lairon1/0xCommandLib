@@ -13,6 +13,7 @@ public class SubCommandSettings {
     private boolean onlyPlayer;
     private List<String> aliases;
     private String permission;
+    private boolean async;
 
     /**
      * @param id Command ID. Like this /somecommand subCommandID <--
@@ -22,7 +23,7 @@ public class SubCommandSettings {
      * @param permission The permissions required to use the command.
      *                   If null then permissions are not needed.
      */
-    public SubCommandSettings(String id, boolean onlyPlayer, List<String> aliases, String permission) {
+    public SubCommandSettings(String id, boolean onlyPlayer, List<String> aliases, String permission, boolean async) {
         Objects.requireNonNull(id, "id can not be null");
         this.id = id;
         this.onlyPlayer = onlyPlayer;
@@ -34,7 +35,7 @@ public class SubCommandSettings {
      * @param id Command ID. Like this /somecommand subCommandID <--
      */
     public SubCommandSettings(String id) {
-        this(id, false, null, null);
+        this(id, false, null, null, false);
     }
 
     /**
@@ -88,6 +89,14 @@ public class SubCommandSettings {
         this.permission = permission;
     }
 
+    public boolean isAsync() {
+        return async;
+    }
+
+    public void setAsync(boolean async) {
+        this.async = async;
+    }
+
     public static Builder builder(String id){
         return new Builder(id);
     }
@@ -98,6 +107,7 @@ public class SubCommandSettings {
         private boolean onlyPlayer = false;
         private List<String> aliases;
         private String permission;
+        private boolean async = false;
 
         public Builder(String id) {
             Objects.requireNonNull(id, "id can not be null");
@@ -126,8 +136,13 @@ public class SubCommandSettings {
             return this;
         }
 
+        public Builder async(boolean async){
+            this.async = async;
+            return this;
+        }
+
         public SubCommandSettings build(){
-            return new SubCommandSettings(id, onlyPlayer, aliases, permission);
+            return new SubCommandSettings(id, onlyPlayer, aliases, permission, async);
         }
 
     }
