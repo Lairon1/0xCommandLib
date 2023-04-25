@@ -1,21 +1,25 @@
 ## Give me what I need
 ### dependency
 
+
 ```xml
-    <repository>
-        <id>lairon-libs</id>
-        <url>https://github.com/Lairon1/0xCommandLib/raw/repository</url>
-    </repository>
+<repository>
+    <id>space-lairon-libs</id>
+    <url>https://maven.pkg.jetbrains.space/0xlairon1/p/main/lairon-libs</url>
+</repository>
 ```
 
 ```xml
-    <dependency>
-        <groupId>ru.lairon.libs</groupId>
-        <artifactId>0xCommandLib</artifactId>
-        <version>2.2</version>
-        <scope>compile</scope>
-    </dependency>
+<dependency>
+    <groupId>ru.lairon.libs</groupId>
+    <artifactId>0xCommandLib</artifactId>
+    <version>2.2.1</version>
+    <scope>compile</scope>
+</dependency>
 ```
+
+
+
 
 ## About
 XCommandLib is a simple library that will help you quickly and easily create commands and subcommands. You can also configure your subcommands as you go.
